@@ -6,7 +6,7 @@
 /*   By: dkoca <dkoca@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 02:34:50 by dkoca             #+#    #+#             */
-/*   Updated: 2024/04/07 12:28:10 by dkoca            ###   ########.fr       */
+/*   Updated: 2024/04/07 22:05:36 by dkoca            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,31 @@ int parse_input(char *line)
 	return(num_input);
 }
 
+void fill_in_strategy(t_heaps *heap)
+{
+	int i;
+	int prev_heap;
+	int prev_strategy;
+	
+	heap->strategy = malloc(sizeof(size_t) * heap->heap_n);
+	heap->strategy[0] = WIN;
+	i = 1;
+	while (i < (int)heap->heap_n)
+	{
+		prev_heap = heap->heap[i - 1];
+		prev_strategy = heap->strategy[i - 1];
+		if (prev_heap % 4 == 1 && prev_strategy == WIN)
+			heap->strategy[i] = LOSE;
+		else if (prev_heap % 4 != 1 && prev_strategy == WIN)
+			heap->strategy[i] = WIN;
+		else if (prev_heap % 4 == 0 && prev_strategy == LOSE)
+			heap->strategy[i] = LOSE;
+		else if (prev_heap % 4 != 0 && prev_strategy == LOSE)
+			heap->strategy[i] = WIN;
+		i++;
+	}
+}
+
 int is_valid_input(int fd, t_heaps *heap)
 {
 	char *line;
@@ -48,17 +73,22 @@ int is_valid_input(int fd, t_heaps *heap)
 		cur_input = parse_input(line); //check if valid input
 		free(line);
 		if (cur_input == ERROR)
-			return free(heap->heap), print_err(INPUT_ERROR), ERROR;
+		{
+			close(fd);
+			get_next_line(fd);
+			return print_err(INPUT_ERROR), ERROR;
+		}
 		heap->heap = ft_realloc(&heap->heap, heap_count + 1, 0);
 		heap->heap[heap_count] = (size_t)cur_input; //fill array
-		printf("sticks = %zu and heap = %zu\n", heap->heap[heap_count], heap_count);
 		heap_count++;
 		line = get_next_line(fd);		
 	}
+	close(fd);
+	get_next_line(fd);
 	if (line == NULL)
 		return print_err(INPUT_ERROR), ERROR;
-	close(fd);
-	heap->heap_n = heap_count; 
+	heap->heap_n = heap_count;
+	fill_in_strategy(heap); 
 	return (EXIT_SUCCESS);
 	
 }

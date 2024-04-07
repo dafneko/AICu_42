@@ -6,7 +6,7 @@
 /*   By: dkoca <dkoca@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 02:35:03 by dkoca             #+#    #+#             */
-/*   Updated: 2024/04/07 11:35:08 by dkoca            ###   ########.fr       */
+/*   Updated: 2024/04/07 19:42:25 by dkoca            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 typedef struct s_heaps
 {
 	size_t *heap;
+	int *strategy;
 	size_t heap_n;
 }		t_heaps;
 
@@ -43,7 +44,7 @@ size_t *ft_realloc(size_t **ptr, int size, int i);
 /*gameplay.c*/
 void	start_game(t_heaps *heap);
 int play_nim(int current_heap, t_heaps *heap);
-int player_turn(int sticks_left);
+int player_turn(t_heaps *heap, int sticks_left);
 int	ai_turn(t_heaps *heap, int current_heap, int sticks_left);
 int lose_state(int sticks);
 int win_state(int sticks);
